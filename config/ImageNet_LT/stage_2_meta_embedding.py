@@ -36,7 +36,8 @@ criterions = {}
 perf_loss_param = {}
 criterions['PerformanceLoss'] = {'def_file': './loss/SoftmaxLoss.py', 'loss_params': perf_loss_param,
                                  'optim_params': None, 'weight': 1.0}
-feat_loss_param = {'feat_dim': training_opt['feature_dim'], 'num_classes': training_opt['num_classes']}
+feat_loss_param = {
+    'feat_dim': training_opt['feature_dim'], 'num_classes': training_opt['num_classes']}
 feat_loss_optim_param = {'lr': 0.01, 'momentum': 0.9, 'weight_decay': 0.0005}
 criterions['FeatureLoss'] = {'def_file': './loss/DiscCentroidsLoss.py', 'loss_params': feat_loss_param,
                              'optim_params': feat_loss_optim_param, 'weight': 0.01}

@@ -111,7 +111,8 @@ class ResNet(nn.Module):
         self.use_modulatedatt = use_modulatedatt
         if self.use_modulatedatt:
             print('Using self attention.')
-            self.modulatedatt = ModulatedAttLayer(in_channels=512 * block.expansion)
+            self.modulatedatt = ModulatedAttLayer(
+                in_channels=512 * block.expansion)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):

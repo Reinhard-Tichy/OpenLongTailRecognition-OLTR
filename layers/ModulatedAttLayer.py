@@ -8,9 +8,11 @@ from torch.nn import functional as F
 import pdb
 
 # TODO: implement dot_product and other non-local formats
+
+
 class ModulatedAttLayer(nn.Module):
 
-    def __init__(self, in_channels, reduction = 2, mode='embedded_gaussian'):
+    def __init__(self, in_channels, reduction=2, mode='embedded_gaussian'):
         super(ModulatedAttLayer, self).__init__()
         self.in_channels = in_channels
         self.reduction = reduction
@@ -18,10 +20,14 @@ class ModulatedAttLayer(nn.Module):
         self.mode = mode
         assert mode in ['embedded_gaussian']
 
-        self.g = nn.Conv2d(self.in_channels, self.inter_channels, kernel_size = 1)
-        self.theta = nn.Conv2d(self.in_channels, self.inter_channels, kernel_size = 1)
-        self.phi = nn.Conv2d(self.in_channels, self.inter_channels, kernel_size = 1)
-        self.conv_mask = nn.Conv2d(self.inter_channels, self.in_channels, kernel_size = 1, bias=False)
+        self.g = nn.Conv2d(
+            self.in_channels, self.inter_channels, kernel_size=1)
+        self.theta = nn.Conv2d(
+            self.in_channels, self.inter_channels, kernel_size=1)
+        self.phi = nn.Conv2d(
+            self.in_channels, self.inter_channels, kernel_size=1)
+        self.conv_mask = nn.Conv2d(
+            self.inter_channels, self.in_channels, kernel_size=1, bias=False)
         self.relu = nn.ReLU(inplace=True)
 
         self.avgpool = nn.AvgPool2d(7, stride=1)
@@ -46,7 +52,8 @@ class ModulatedAttLayer(nn.Module):
 
         g_x = self.g(x.clone()).view(batch_size, self.inter_channels, -1)
         g_x = g_x.permute(0, 2, 1)
-        theta_x = self.theta(x.clone()).view(batch_size, self.inter_channels, -1)
+        theta_x = self.theta(x.clone()).view(
+            batch_size, self.inter_channels, -1)
         theta_x = theta_x.permute(0, 2, 1)
         phi_x = self.phi(x.clone()).view(batch_size, self.inter_channels, -1)
 
@@ -57,9 +64,9 @@ class ModulatedAttLayer(nn.Module):
         map_ = map_.permute(0, 2, 1).contiguous()
         map_ = map_.view(batch_size, self.inter_channels, x.size(2), x.size(3))
         mask = self.conv_mask(map_)
-        
+
         x_flatten = x.view(-1, 7 * 7 * self.in_channels)
-        
+
         spatial_att = self.fc_spatial(x_flatten)
         spatial_att = spatial_att.softmax(dim=1)
 

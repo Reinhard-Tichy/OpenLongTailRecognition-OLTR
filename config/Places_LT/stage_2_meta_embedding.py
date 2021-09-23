@@ -13,11 +13,11 @@ training_opt['feature_dim'] = 512
 training_opt['open_threshold'] = 0.1
 training_opt['sampler'] = {'type': 'ClassAwareSampler', 'def_file': './data/ClassAwareSampler.py',
                            'num_samples_cls': 4}
-training_opt['scheduler_params'] = {'step_size':10, 'gamma':0.1}
+training_opt['scheduler_params'] = {'step_size': 10, 'gamma': 0.1}
 config['training_opt'] = training_opt
 
 networks = {}
-feature_param = {'use_modulatedatt': True, 'use_fc': True, 'dropout': None, 
+feature_param = {'use_modulatedatt': True, 'use_fc': True, 'dropout': None,
                  'stage1_weights': True, 'dataset': training_opt['dataset'], 'caffe': False}
 feature_optim_param = {'lr': 0.0001, 'momentum': 0.9, 'weight_decay': 0.0005}
 networks['feat_model'] = {'def_file': './models/ResNet152Feature.py',
@@ -36,8 +36,9 @@ criterions = {}
 perf_loss_param = {}
 criterions['PerformanceLoss'] = {'def_file': './loss/SoftmaxLoss.py', 'loss_params': perf_loss_param,
                                  'optim_params': None, 'weight': 1.0}
-feat_loss_param = {'feat_dim': training_opt['feature_dim'], 'num_classes': training_opt['num_classes']}
-feat_loss_optim_param = {'lr': 0.01, 'momentum':0.9, 'weight_decay':0.0005}
+feat_loss_param = {
+    'feat_dim': training_opt['feature_dim'], 'num_classes': training_opt['num_classes']}
+feat_loss_optim_param = {'lr': 0.01, 'momentum': 0.9, 'weight_decay': 0.0005}
 criterions['FeatureLoss'] = {'def_file': './loss/DiscCentroidsLoss.py', 'loss_params': feat_loss_param,
                              'optim_params': feat_loss_optim_param, 'weight': 0.01}
 config['criterions'] = criterions
