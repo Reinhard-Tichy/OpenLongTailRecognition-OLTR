@@ -2,6 +2,7 @@ from torch.utils.data import Dataset, DataLoader, ConcatDataset
 from torchvision import transforms
 import os
 from PIL import Image
+from mcloader import McLoader
 
 # Data transformation with augmentation
 data_transforms = {
@@ -36,10 +37,19 @@ class LT_Dataset(Dataset):
         self.img_path = []
         self.labels = []
         self.transform = transform
-        with open(txt) as f:
+        with open(os.path.join(root, txt)) as f:
             for line in f:
                 self.img_path.append(os.path.join(root, line.split()[0]))
                 self.labels.append(int(line.split()[1]))
+        self.mclient = None
+        self.initialized = False
+        self._ensure_memcached()
+
+    def _ensure_memcached(self):
+        if not self.initialized:
+            self.mclient = McLoader('/mnt/lustre/share/memcached_client')
+            self.initialized = True
+        return
 
     def __len__(self):
         return len(self.labels)
@@ -49,8 +59,8 @@ class LT_Dataset(Dataset):
         path = self.img_path[index]
         label = self.labels[index]
 
-        with open(path, 'rb') as f:
-            sample = Image.open(f).convert('RGB')
+        sample = self.mclient(path)
+        sample = sample.convert('RGB')
 
         if self.transform is not None:
             sample = self.transform(sample)
@@ -62,8 +72,7 @@ class LT_Dataset(Dataset):
 
 def load_data(data_root, dataset, phase, batch_size, sampler_dic=None, num_workers=4, test_open=False, shuffle=True):
 
-    txt = './data/%s/%s_%s.txt' % (dataset, dataset,
-                                   (phase if phase != 'train_plain' else 'train'))
+    txt = '%s_%s.txt' % (dataset, (phase if phase != 'train_plain' else 'train'))
 
     print('Loading data from %s' % (txt))
 
